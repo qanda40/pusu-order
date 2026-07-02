@@ -62,4 +62,203 @@
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
                 <input type="number" class="product-qty" data-name="麻辣素肉乾" data-price="200" min="0" value="0" readonly>
-                <button
+                <button type="button" onclick="changeQty(this, 1)">+</button>
+            </div>
+        </div>
+        <div class="product-item">
+            <div>
+                <span class="product-name">✻ 何首烏養生湯</span>
+                <span class="product-price">($220)</span>
+            </div>
+            <div class="quantity-group">
+                <button type="button" onclick="changeQty(this, -1)">-</button>
+                <input type="number" class="product-qty" data-name="何首烏養生湯" data-price="220" min="0" value="0" readonly>
+                <button type="button" onclick="changeQty(this, 1)">+</button>
+            </div>
+        </div>
+        <div class="product-item">
+            <div>
+                <span class="product-name">✻ 猴菇四神湯</span>
+                <span class="product-price">($220)</span>
+            </div>
+            <div class="quantity-group">
+                <button type="button" onclick="changeQty(this, -1)">-</button>
+                <input type="number" class="product-qty" data-name="猴菇四神湯" data-price="220" min="0" value="0" readonly>
+                <button type="button" onclick="changeQty(this, 1)">+</button>
+            </div>
+        </div>
+        <div class="product-item">
+            <div>
+                <span class="product-name">✻ 麻辣豆腐醬</span>
+                <span class="product-price">($180)</span>
+            </div>
+            <div class="quantity-group">
+                <button type="button" onclick="changeQty(this, -1)">-</button>
+                <input type="number" class="product-qty" data-name="麻辣豆腐醬" data-price="180" min="0" value="0" readonly>
+                <button type="button" onclick="changeQty(this, 1)">+</button>
+            </div>
+        </div>
+        <div class="product-item">
+            <div>
+                <span class="product-name">✻ 撈麵醬</span>
+                <span class="product-price">($150)</span>
+            </div>
+            <div class="quantity-group">
+                <button type="button" onclick="changeQty(this, -1)">-</button>
+                <input type="number" class="product-qty" data-name="撈麵醬" data-price="150" min="0" value="0" readonly>
+                <button type="button" onclick="changeQty(this, 1)">+</button>
+            </div>
+        </div>
+
+        <div class="total-price-box">
+            訂單總金額：$<span id="totalPriceDisplay">0</span> 元
+        </div>
+
+        <div class="form-group">
+            <label for="shipping">收貨方式</label>
+            <select id="shipping" onchange="updateAddressLabel()" required>
+                <option value="7-11店到店">7-11店到店</option>
+                <option value="全家店到店">全家店到店</option>
+                <option value="宅配">宅配</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="username">收貨人姓名</label>
+            <input type="text" id="username" placeholder="請填寫收件人真實姓名" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">收貨人電話</label>
+            <input type="text" id="phone" placeholder="請填寫聯絡電話" required>
+        </div>
+        
+        <div class="form-group">
+            <label id="addressLabel" for="address">選擇[超商]請提供[店名]：</label>
+            <input type="text" id="address" placeholder="請填寫超商門市名稱 (例如：中正店)" required>
+        </div>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="agreeCheckbox" required>
+            <label for="agreeCheckbox" style="display:inline; font-weight:normal; margin:0; cursor:pointer;">
+                我已閱讀並同意訂購說明 ✅
+            </label>
+        </div>
+
+        <button type="submit" class="submit-btn">確認送出訂單</button>
+    </form>
+</div>
+
+<script>
+    // 填入你的 LIFF ID
+    const MY_LIFF_ID = '2010580407-4JQQOeBf'; 
+
+    async function initLiff() {
+        try {
+            await liff.init({ liffId: MY_LIFF_ID });
+            if (!liff.isLoggedIn()) {
+                liff.login();
+            }
+        } catch (error) {
+            console.error('LIFF 初始化失敗', error);
+        }
+    }
+
+    // 數量加減按鈕控制，並即時計算總金額
+    function changeQty(button, amount) {
+        const input = button.parentElement.querySelector('.product-qty');
+        let currentVal = parseInt(input.value) || 0;
+        let newVal = currentVal + amount;
+        if (newVal < 0) newVal = 0;
+        input.value = newVal;
+        
+        // 每次數量改變，就重新算總金額
+        calculateTotal();
+    }
+
+    // 計算總金額的函式
+    function calculateTotal() {
+        let total = 0;
+        const qtyInputs = document.querySelectorAll('.product-qty');
+        qtyInputs.forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            const price = parseInt(input.getAttribute('data-price')) || 0;
+            total += qty * price;
+        });
+        document.getElementById('totalPriceDisplay').innerText = total;
+        return total;
+    }
+
+    // 動態更新地址欄位的文字提示（範例改成中正店）
+    function updateAddressLabel() {
+        const shipping = document.getElementById('shipping').value;
+        const label = document.getElementById('addressLabel');
+        const input = document.getElementById('address');
+        
+        if (shipping === '宅配') {
+            label.innerText = '選擇[宅配]請提供[住址]：';
+            input.placeholder = '請填寫完整外送/寄送住址';
+        } else {
+            label.innerText = '選擇[超商]請提供[店名]：';
+            input.placeholder = '請填寫超商門市名稱 (例如：中正店)';
+        }
+    }
+
+    // 表單送出事件
+    document.getElementById('orderForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // 1. 統計勾選的品項與加總
+        let itemsSummary = '';
+        let totalOrderPrice = 0;
+        const qtyInputs = document.querySelectorAll('.product-qty');
+        
+        qtyInputs.forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            const price = parseInt(input.getAttribute('data-price')) || 0;
+            if (qty > 0) {
+                itemsSummary += `項目：✻ ${input.getAttribute('data-name')} x ${qty}\n`;
+                totalOrderPrice += qty * price;
+            }
+        });
+
+        if (!itemsSummary) {
+            alert('請至少選擇一項商品的數量唷！');
+            return;
+        }
+
+        // 2. 讀取填寫欄位
+        const shipping = document.getElementById('shipping').value;
+        const name = document.getElementById('username').value;
+        const phone = document.getElementById('phone').value;
+        const address = document.getElementById('address').value;
+
+        // 3. 依照收貨方式，組裝地址或店名格式
+        let addressSection = '';
+        if (shipping === '宅配') {
+            addressSection = `選擇[宅配]請提供[住址]：${address}`;
+        } else {
+            addressSection = `選擇[超商]請提供[店名]：${address}`;
+        }
+
+        // 4. LINE 格式輸出（最後加上加總金額）
+        const messageText = `《我要訂購》\n品項與數量：\n${itemsSummary}\n收貨方式：[${shipping}]\n收貨人姓名：${name}\n收貨人電話：${phone}\n${addressSection}\n💰 訂單總金額：$${totalOrderPrice} 元\n\n我已閱讀並同意訂購說明 ✅`;
+
+        // 5. 透過 LINE 發送訊息並關閉網頁
+        if (liff.isInClient()) {
+            try {
+                await liff.sendMessages([{ type: 'text', text: messageText }]);
+                liff.closeWindow();
+            } catch (err) {
+                alert('訊息傳送失敗：' + err.message);
+            }
+        } else {
+            alert('偵測到不在 LINE 內，模擬發送訊息：\n\n' + messageText);
+        }
+    });
+
+    // 啟動 LIFF
+    initLiff();
+</script>
+</body>
+</html>
