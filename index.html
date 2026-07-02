@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>普素素食 - 線上訂購</title>
+    <!-- 引入 LINE LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f7f4; color: #333; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h2 { color: #4CAF50; text-align: center; }
+        .user-info { margin-bottom: 15px; font-weight: bold; color: #666; }
+        .product-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .qty-input { width: 60px; padding: 5px; text-align: center; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 12px; background-color: #4CAF50; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 15px; }
+        button:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>普素素食 訂購單</h2>
+    <div class="user-info" id="user-display">正在載入您的 LINE 資訊...</div>
+
+    <form id="orderForm">
+        <!-- 這裡放你的素食冷凍包品項 -->
+        <div class="product-item">
+            <span>招牌蘿蔔糕 ($155)</span>
+            <input type="number" class="product-qty" data-name="招牌蘿蔔糕" min="0" value="0">
+        </div>
+        <div class="product-item">
+            <span>特製芋頭糕 ($200)</span>
+            <input type="number" class="product-qty" data-name="特製芋頭糕" min="0" value="0">
+        </div>
+
+        <!-- 訂購人資訊 -->
+        <div class="form-group">
+            <label for="username">收件人姓名</label>
+            <input type="text" id="username" required>
+        </div>
+        <div class="form-group">
+            <label for="phone">收件人電話</label>
+            <input type="text" id="phone" required>
+        </div>
+        <div class="form-group">
+            <label for="shipping">收貨方式</label>
+            <select id="shipping" required>
+                <option value="7-11店到店">7-11店到店</option>
+                <option value="全家店到店">全家店到店</option>
+                <option value="黑貓冷凍宅配">黑貓冷凍宅配</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="address">收件地址 / 超商門市名稱</label>
+            <input type="text" id="address" required>
+        </div>
+
+        <button type="submit">確認送出訂單</button>
+    </form>
+</div>
+
+<script>
+    // 填入你在 LINE 開發者後台取得的 LIFF ID
+    const MY_LIFF_ID = '2010580407-4JQQOeBf'; 
+
+
+    async function initLiff() {
+        try {
+            await liff.init({ liffId: MY_LIFF_ID });
+            if (liff.isLoggedIn()) {
+                const profile = await liff.getProfile();
+                document.getElementById('user-display').innerText = `你好，${profile.displayName}！請填寫以下訂購資訊：`;
+                // 順便把 LINE 名字預填到姓名欄位，貼心！
+                document.getElementById('username').value = profile.displayName; 
+            } else {
+                liff.login(); // 如果沒登入就引導登入
+            }
+        } catch (error) {
+            console.error('LIFF 初始化失敗', error);
+            document.getElementById('user-display').innerText = '無法載入 LINE 資訊，請在 LINE 內開啟。';
+        }
+    }
+
+    document.getElementById('orderForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // 1. 統計品項與數量
+        let itemsSummary = '';
+        const qtyInputs = document.querySelectorAll('.product-qty');
+        qtyInputs.forEach(input => {
+            const qty = parseInt(input.value);
+            if (qty > 0) {
+                itemsSummary += ` 🔹 ${input.getAttribute('data-name')} x ${qty}\n`;
+            }
+        });
+
+        if (!itemsSummary) {
+            alert('請至少選擇一個商品數量唷！');
+            return;
+        }
+
+        // 2. 抓取文字欄位
+        const name = document.getElementById('username').value;
+        const phone = document.getElementById('phone').value;
+        const shipping = document.getElementById('shipping').value;
+        const address = document.getElementById('address').value;
+
+        // 3. 組裝要發送回聊天室的文字明細
+        const messageText = `《普素素食新訂單》\n\n【訂購品項】\n${itemsSummary}\n【收件資訊】\n👤 姓名：${name}\n📞 電話：${phone}\n📦 方式：${shipping}\n📍 地址/門市：${address}\n\n填單完成！請媽媽核對金額與出貨時間。`;
+
+        // ==========================================
+        // 🚀 這裡之後可以加上 fetch() 打到你的資料庫 (如 Google Sheets)
+        // ==========================================
+
+        // 4. 利用 LIFF 幫客人在聊天室發出訊息，並關閉視窗
+        if (liff.isInClient()) {
+            try {
+                await liff.sendMessages([{ type: 'text', text: messageText }]);
+                liff.closeWindow(); // 成功發送後自動關閉網頁
+            } catch (err) {
+                alert('訊息傳送失敗：' + err.message);
+            }
+        } else {
+            // 如果是用一般瀏覽器打開的(非LINE內)，就用 alert 呈現
+            alert('偵測到不在 LINE 內，模擬發送訊息：\n\n' + messageText);
+        }
+    });
+
+    // 啟動 LIFF
+    initLiff();
+</script>
+</body>
+</html>
