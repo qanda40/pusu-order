@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>普素素食 - 2026年7月線上訂購</title>
+    <!-- 引入 LINE LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f7f4; color: #333; }
@@ -43,77 +44,80 @@
     <div class="subtitle">歡迎使用線上訂購，請填寫以下表單：</div>
 
     <form id="orderForm">
+        <!-- 1. 正確品項名稱與真實價格 -->
         <div class="product-item">
             <div>
-                <span class="product-name">▪ 素麵線</span>
-                <span class="product-price">($155)</span>
+                <span class="product-name">▪ 素麵線 1000g</span>
+                <span class="product-price">($120)</span>
             </div>
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
-                <input type="number" class="product-qty" data-name="素麵線" data-price="155" min="0" value="0" readonly>
+                <input type="number" class="product-qty" data-name="素麵線 1000g" data-price="120" min="0" value="0" readonly>
                 <button type="button" onclick="changeQty(this, 1)">+</button>
             </div>
         </div>
         <div class="product-item">
             <div>
-                <span class="product-name">▪ 麻辣素肉乾</span>
-                <span class="product-price">($200)</span>
+                <span class="product-name">▪ 麻辣素肉乾 250g</span>
+                <span class="product-price">($160)</span>
             </div>
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
-                <input type="number" class="product-qty" data-name="麻辣素肉乾" data-price="200" min="0" value="0" readonly>
+                <input type="number" class="product-qty" data-name="麻辣素肉乾 250g" data-price="160" min="0" value="0" readonly>
                 <button type="button" onclick="changeQty(this, 1)">+</button>
             </div>
         </div>
         <div class="product-item">
             <div>
-                <span class="product-name">▪ 何首烏養生湯</span>
-                <span class="product-price">($220)</span>
+                <span class="product-name">▪ 何首烏養生湯 800g</span>
+                <span class="product-price">($160)</span>
             </div>
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
-                <input type="number" class="product-qty" data-name="何首烏養生湯" data-price="220" min="0" value="0" readonly>
+                <input type="number" class="product-qty" data-name="何首烏養生湯 800g" data-price="160" min="0" value="0" readonly>
                 <button type="button" onclick="changeQty(this, 1)">+</button>
             </div>
         </div>
         <div class="product-item">
             <div>
-                <span class="product-name">▪ 猴菇四神湯</span>
-                <span class="product-price">($220)</span>
+                <span class="product-name">▪ 猴菇四神湯 800g</span>
+                <span class="product-price">($130)</span>
             </div>
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
-                <input type="number" class="product-qty" data-name="猴菇四神湯" data-price="220" min="0" value="0" readonly>
+                <input type="number" class="product-qty" data-name="猴菇四神湯 800g" data-price="130" min="0" value="0" readonly>
                 <button type="button" onclick="changeQty(this, 1)">+</button>
             </div>
         </div>
         <div class="product-item">
             <div>
-                <span class="product-name">▪ 麻辣豆腐醬</span>
-                <span class="product-price">($180)</span>
+                <span class="product-name">▪ 麻辣豆腐醬 120g</span>
+                <span class="product-price">($90)</span>
             </div>
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
-                <input type="number" class="product-qty" data-name="麻辣豆腐醬" data-price="180" min="0" value="0" readonly>
+                <input type="number" class="product-qty" data-name="麻辣豆腐醬 120g" data-price="90" min="0" value="0" readonly>
                 <button type="button" onclick="changeQty(this, 1)">+</button>
             </div>
         </div>
         <div class="product-item">
             <div>
-                <span class="product-name">▪ 撈麵醬</span>
-                <span class="product-price">($150)</span>
+                <span class="product-name">▪ 撈麵醬 120g</span>
+                <span class="product-price">($90)</span>
             </div>
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
-                <input type="number" class="product-qty" data-name="撈麵醬" data-price="150" min="0" value="0" readonly>
+                <input type="number" class="product-qty" data-name="撈麵醬 120g" data-price="90" min="0" value="0" readonly>
                 <button type="button" onclick="changeQty(this, 1)">+</button>
             </div>
         </div>
 
+        <!-- 總金額顯示 -->
         <div class="total-price-box">
             訂單總金額：$<span id="totalPriceDisplay">0</span> 元
         </div>
 
+        <!-- 2. 客人資訊欄位 -->
         <div class="form-group">
             <label for="username">收貨人姓名</label>
             <input type="text" id="username" placeholder="請填寫收件人真實姓名" required>
@@ -138,6 +142,7 @@
             <input type="text" id="address" placeholder="請填寫超商門市名稱 (例如：中正店)" required>
         </div>
 
+        <!-- 3. 同意條款勾選 -->
         <div class="checkbox-group">
             <input type="checkbox" id="agreeCheckbox" required>
             <label for="agreeCheckbox" style="display:inline; font-weight:normal; margin:0; cursor:pointer;">
@@ -210,7 +215,6 @@
             const qty = parseInt(input.value) || 0;
             const price = parseInt(input.getAttribute('data-price')) || 0;
             if (qty > 0) {
-                // 這裡完美替換成 ▪ 符號
                 itemsSummary += `▪ ${input.getAttribute('data-name')} x ${qty}\n`;
                 totalOrderPrice += qty * price;
             }
