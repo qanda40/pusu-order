@@ -238,7 +238,7 @@
             label.innerText = '自取地址：';
             input.placeholder = '請至約定地點取貨';
             input.value = '面交自取';
-            input.disabled = true; // 鎖定輸入框
+            input.disabled = true; 
             input.required = false;
         } else {
             label.innerText = '超商店名：';
@@ -283,7 +283,7 @@
         if (shipping === '宅配') locationLabel = '收件住址';
         if (shipping === '自取') locationLabel = '取貨說明';
 
-        // 1. 包裝乾淨獨立的欄位資料傳給試算表（不用動 GAS 警衛，欄位會自動對齊填入）
+        // 傳送給 Google 試算表
         const orderDataForSheet = {
             name: name,
             phone: phone,
@@ -303,8 +303,8 @@
             console.error('後台試算表寫入錯誤：', err);
         }
 
-        // 2. LINE 聊天室維持精簡格式
-        const messageText = `《普素素食 2026年7月訂購單》\n\n訂購品項與數量：\n${itemsSummary}💰 訂單總金額：$${priceAmounts.finalTotal} 元\n\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n我已閱讀並同意訂購說明 ✅`;
+        // 3. 🌟 修改這裡：完美對齊你想要的 LINE 訊息格式！
+        const messageText = `《普素素食 2026年7月訂購單》\n\n訂購品項與數量：\n${itemsSummary}\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n商品總計：$${priceAmounts.subtotal} 元\n運費＋包材費：$${priceAmounts.shippingFee} 元\n💰 訂單總金額：$${priceAmounts.finalTotal} 元\n\n我已閱讀並同意訂購說明 ✅`;
 
         if (liff.isInClient()) {
             try {
