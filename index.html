@@ -260,13 +260,15 @@
 
         let locationLabel = (shipping === '宅配') ? '收件住址' : '超商店名';
 
-        // 寫入試算表資料（後台欄位也同步更名為「商品小計」的標記）
+        // 1. 包裝乾淨獨立的欄位資料傳給試算表
         const orderDataForSheet = {
             name: name,
             phone: phone,
             shipping: shipping,
             address: address,
-            itemsAndTotal: itemsForSheet.join(', ') + ` (小計:$${priceAmounts.subtotal}, 運費:$${priceAmounts.shippingFee}, 總計:$${priceAmounts.finalTotal}元)`
+            itemsOnly: itemsForSheet.join(', '), // 純品項字串
+            subtotal: priceAmounts.subtotal,     // 純小計數字
+            finalTotal: priceAmounts.finalTotal   // 純總額數字
         };
 
         try {
@@ -278,6 +280,7 @@
             console.error('後台試算表寫入錯誤：', err);
         }
 
+        // 2. LINE 聊天室維持精簡格式
         const messageText = `《普素素食 2026年7月訂購單》\n\n訂購品項與數量：\n${itemsSummary}💰 訂單總金額：$${priceAmounts.finalTotal} 元\n\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n我已閱讀並同意訂購說明 ✅`;
 
         if (liff.isInClient()) {
