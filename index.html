@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>普素素食 - 2026年7月線上訂購</title>
-    <!-- 引入 LINE LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f7f4; color: #333; }
@@ -44,7 +43,6 @@
     <div class="subtitle">歡迎使用線上訂購，請填寫以下表單：</div>
 
     <form id="orderForm">
-        <!-- 1. 正確品項名稱與真實價格 -->
         <div class="product-item">
             <div>
                 <span class="product-name">▪ 素麵線 1000g</span>
@@ -112,12 +110,10 @@
             </div>
         </div>
 
-        <!-- 總金額顯示 -->
         <div class="total-price-box">
             訂單總金額：$<span id="totalPriceDisplay">0</span> 元
         </div>
 
-        <!-- 2. 客人資訊欄位 -->
         <div class="form-group">
             <label for="username">收貨人姓名</label>
             <input type="text" id="username" placeholder="請填寫收件人真實姓名" required>
@@ -142,7 +138,6 @@
             <input type="text" id="address" placeholder="請填寫超商門市名稱 (例如：中正店)" required>
         </div>
 
-        <!-- 3. 同意條款勾選 -->
         <div class="checkbox-group">
             <input type="checkbox" id="agreeCheckbox" required>
             <label for="agreeCheckbox" style="display:inline; font-weight:normal; margin:0; cursor:pointer;">
@@ -156,6 +151,9 @@
 
 <script>
     const MY_LIFF_ID = '2010580407-4JQQOeBf'; 
+    
+    // 🔗 這裡已經幫你更換成最新的 Google 試算表網路應用程式網址囉！
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwVgpjtJegfW-UaSUbDCCccfE4WIeaAUOuCYT2_oFtfR5zBCgB3Hobl5EaaaK32mExlyQ/exec';
 
     async function initLiff() {
         try {
@@ -200,7 +198,11 @@
             input.placeholder = '請填寫完整寄送住址';
         } else {
             label.innerText = '超商店名：';
-            input.placeholder = '請填寫超商門市名稱 (例如：中正店)';
+            if (shipping === '7-11店到店') {
+                input.placeholder = '請填寫7-11門市名稱 (例如：中正店)';
+            } else {
+                input.placeholder = '請填寫全家門市名稱 (例如：中正店)';
+            }
         }
     }
 
@@ -208,6 +210,7 @@
         e.preventDefault();
 
         let itemsSummary = '';
+        let itemsForSheet = []; 
         let totalOrderPrice = 0;
         const qtyInputs = document.querySelectorAll('.product-qty');
         
@@ -215,7 +218,9 @@
             const qty = parseInt(input.value) || 0;
             const price = parseInt(input.getAttribute('data-price')) || 0;
             if (qty > 0) {
-                itemsSummary += `▪ ${input.getAttribute('data-name')} x ${qty}\n`;
+                const name = input.getAttribute('data-name');
+                itemsSummary += `▪ ${name} x ${qty}\n`;
+                itemsForSheet.push(`${name}x${qty}`);
                 totalOrderPrice += qty * price;
             }
         });
@@ -232,7 +237,26 @@
 
         let locationLabel = (shipping === '宅配') ? '收件住址' : '超商店名';
 
-        // LINE 訊息最終完美精簡新格式
+        // 1. 組裝要寫入試算表的資料
+        const orderDataForSheet = {
+            name: name,
+            phone: phone,
+            shipping: shipping,
+            address: address,
+            itemsAndTotal: itemsForSheet.join(', ') + ` (總計: $${totalOrderPrice}元)`
+        };
+
+        // 2. 同步發送資料到 Google 試算表
+        try {
+            fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify(orderDataForSheet)
+            });
+        } catch (err) {
+            console.error('後台試算表寫入錯誤：', err);
+        }
+
+        // 3. LINE 訊息精簡格式輸出
         const messageText = `《普素素食 2026年7月訂購單》\n\n訂購品項與數量：\n${itemsSummary}💰 訂單總金額：$${totalOrderPrice} 元\n\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n我已閱讀並同意訂購說明 ✅`;
 
         if (liff.isInClient()) {
@@ -243,7 +267,7 @@
                 alert('訊息傳送失敗：' + err.message);
             }
         } else {
-            alert('偵測到不在 LINE 內，模擬發送訊息：\n\n' + messageText);
+            alert('偵測到不在 LINE 內，模擬發送並寫入試算表：\n\n' + messageText);
         }
     });
 
