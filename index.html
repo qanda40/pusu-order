@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>普素素食 - 線上訂購</title>
+    <title>普素素食 - 2026年7月線上訂購</title>
+    <!-- 引入 LINE LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f7f4; color: #333; }
@@ -39,10 +40,11 @@
 <body>
 
 <div class="container">
-    <h2>普素素食 訂購單</h2>
+    <h2>普素素食 2026年7月訂購單</h2>
     <div class="subtitle">歡迎使用線上訂購，請填寫以下表單：</div>
 
     <form id="orderForm">
+        <!-- 1. 最新品項與數量 -->
         <div class="product-item">
             <div>
                 <span class="product-name">✻ 素麵線</span>
@@ -110,10 +112,12 @@
             </div>
         </div>
 
+        <!-- 即時加總總金額顯示區 -->
         <div class="total-price-box">
             訂單總金額：$<span id="totalPriceDisplay">0</span> 元
         </div>
 
+        <!-- 2. 收貨與收件人資訊 -->
         <div class="form-group">
             <label for="shipping">收貨方式</label>
             <select id="shipping" onchange="updateAddressLabel()" required>
@@ -138,6 +142,7 @@
             <input type="text" id="address" placeholder="請填寫超商門市名稱 (例如：中正店)" required>
         </div>
 
+        <!-- 3. 同意條款勾選 -->
         <div class="checkbox-group">
             <input type="checkbox" id="agreeCheckbox" required>
             <label for="agreeCheckbox" style="display:inline; font-weight:normal; margin:0; cursor:pointer;">
@@ -150,7 +155,6 @@
 </div>
 
 <script>
-    // 填入你的 LIFF ID
     const MY_LIFF_ID = '2010580407-4JQQOeBf'; 
 
     async function initLiff() {
@@ -172,7 +176,6 @@
         if (newVal < 0) newVal = 0;
         input.value = newVal;
         
-        // 每次數量改變，就重新算總金額
         calculateTotal();
     }
 
@@ -189,7 +192,7 @@
         return total;
     }
 
-    // 動態更新地址欄位的文字提示（範例改成中正店）
+    // 動態更新地址欄位的文字提示
     function updateAddressLabel() {
         const shipping = document.getElementById('shipping').value;
         const label = document.getElementById('addressLabel');
@@ -241,8 +244,8 @@
             addressSection = `選擇[超商]請提供[店名]：${address}`;
         }
 
-        // 4. LINE 格式輸出（最後加上加總金額）
-        const messageText = `《我要訂購》\n品項與數量：\n${itemsSummary}\n收貨方式：[${shipping}]\n收貨人姓名：${name}\n收貨人電話：${phone}\n${addressSection}\n💰 訂單總金額：$${totalOrderPrice} 元\n\n我已閱讀並同意訂購說明 ✅`;
+        // 4. LINE 格式輸出（開頭改為2026七月，末端加上加總金額）
+        const messageText = `《普素素食 2026年7月訂購單》\n品項與數量：\n${itemsSummary}\n收貨方式：[${shipping}]\n收貨人姓名：${name}\n收貨人電話：${phone}\n${addressSection}\n💰 訂單總金額：$${totalOrderPrice} 元\n\n我已閱讀並同意訂購說明 ✅`;
 
         // 5. 透過 LINE 發送訊息並關閉網頁
         if (liff.isInClient()) {
@@ -257,7 +260,6 @@
         }
     });
 
-    // 啟動 LIFF
     initLiff();
 </script>
 </body>
