@@ -21,8 +21,10 @@
         .product-qty { width: 45px; height: 30px; border: none; text-align: center; font-size: 16px; background: transparent; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         
-        /* 總金額顯示區塊 */
-        .total-price-box { text-align: right; font-size: 18px; font-weight: bold; color: #ff5722; padding: 15px 0; border-bottom: 2px solid #4CAF50; margin-bottom: 15px; }
+        /* 總金額明細顯示區塊 */
+        .price-summary-box { padding: 15px 0; border-bottom: 2px solid #4CAF50; margin-bottom: 15px; font-size: 15px; color: #555; }
+        .price-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .price-row.final-total { font-size: 18px; font-weight: bold; color: #ff5722; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; }
         
         .form-group { margin: 18px 0; }
         label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; }
@@ -110,10 +112,6 @@
             </div>
         </div>
 
-        <div class="total-price-box">
-            訂單總金額：$<span id="totalPriceDisplay">0</span> 元
-        </div>
-
         <div class="form-group">
             <label for="username">收貨人姓名</label>
             <input type="text" id="username" placeholder="請填寫收件人真實姓名" required>
@@ -126,16 +124,31 @@
 
         <div class="form-group">
             <label for="shipping">收貨方式</label>
-            <select id="shipping" onchange="updateAddressLabel()" required>
-                <option value="7-11店到店">7-11店到店</option>
-                <option value="全家店到店">全家店到店</option>
-                <option value="宅配">宅配</option>
+            <select id="shipping" onchange="handleShippingChange()" required>
+                <option value="7-11店到店">7-11店到店 (運費+包材 $149)</option>
+                <option value="全家店到店">全家店到店 (運費+包材 $149)</option>
+                <option value="宅配">宅配 (運費+包材 $305)</option>
             </select>
         </div>
         
         <div class="form-group">
             <label id="addressLabel" for="address">超商店名：</label>
-            <input type="text" id="address" placeholder="請填寫超商門市名稱 (例如：中正店)" required>
+            <input type="text" id="address" placeholder="請填寫7-11門市名稱 (例如：中正店)" required>
+        </div>
+
+        <div class="price-summary-box">
+            <div class="price-row">
+                <span>商品總計：</span>
+                <span>$<span id="subtotalDisplay">0</span> 元</span>
+            </div>
+            <div class="price-row">
+                <span>運費＋包材費：</span>
+                <span>$<span id="shippingFeeDisplay">149</span> 元</span>
+            </div>
+            <div class="price-row final-total">
+                <span>訂單總金額：</span>
+                <span>$<span id="finalTotalDisplay">149</span> 元</span>
+            </div>
         </div>
 
         <div class="checkbox-group">
@@ -151,8 +164,6 @@
 
 <script>
     const MY_LIFF_ID = '2010580407-4JQQOeBf'; 
-    
-    // 🔗 這裡已經幫你更換成最新的 Google 試算表網路應用程式網址囉！
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbwVgpjtJegfW-UaSUbDCCccfE4WIeaAUOuCYT2_oFtfR5zBCgB3Hobl5EaaaK32mExlyQ/exec';
 
     async function initLiff() {
@@ -176,16 +187,29 @@
         calculateTotal();
     }
 
+    function handleShippingChange() {
+        updateAddressLabel();
+        calculateTotal();
+    }
+
     function calculateTotal() {
-        let total = 0;
+        let subtotal = 0;
         const qtyInputs = document.querySelectorAll('.product-qty');
         qtyInputs.forEach(input => {
             const qty = parseInt(input.value) || 0;
             const price = parseInt(input.getAttribute('data-price')) || 0;
-            total += qty * price;
+            subtotal += qty * price;
         });
-        document.getElementById('totalPriceDisplay').innerText = total;
-        return total;
+
+        const shipping = document.getElementById('shipping').value;
+        let shippingFee = (shipping === '宅配') ? 305 : 149;
+        let finalTotal = subtotal + shippingFee;
+
+        document.getElementById('subtotalDisplay').innerText = subtotal;
+        document.getElementById('shippingFeeDisplay').innerText = shippingFee;
+        document.getElementById('finalTotalDisplay').innerText = finalTotal;
+
+        return { subtotal, shippingFee, finalTotal };
     }
 
     function updateAddressLabel() {
@@ -211,17 +235,14 @@
 
         let itemsSummary = '';
         let itemsForSheet = []; 
-        let totalOrderPrice = 0;
         const qtyInputs = document.querySelectorAll('.product-qty');
         
         qtyInputs.forEach(input => {
             const qty = parseInt(input.value) || 0;
-            const price = parseInt(input.getAttribute('data-price')) || 0;
             if (qty > 0) {
                 const name = input.getAttribute('data-name');
                 itemsSummary += `▪ ${name} x ${qty}\n`;
                 itemsForSheet.push(`${name}x${qty}`);
-                totalOrderPrice += qty * price;
             }
         });
 
@@ -235,18 +256,19 @@
         const shipping = document.getElementById('shipping').value;
         const address = document.getElementById('address').value;
 
+        const priceAmounts = calculateTotal();
+
         let locationLabel = (shipping === '宅配') ? '收件住址' : '超商店名';
 
-        // 1. 組裝要寫入試算表的資料
+        // 寫入試算表資料（後台欄位也同步更名為「商品小計」的標記）
         const orderDataForSheet = {
             name: name,
             phone: phone,
             shipping: shipping,
             address: address,
-            itemsAndTotal: itemsForSheet.join(', ') + ` (總計: $${totalOrderPrice}元)`
+            itemsAndTotal: itemsForSheet.join(', ') + ` (小計:$${priceAmounts.subtotal}, 運費:$${priceAmounts.shippingFee}, 總計:$${priceAmounts.finalTotal}元)`
         };
 
-        // 2. 同步發送資料到 Google 試算表
         try {
             fetch(GAS_URL, {
                 method: 'POST',
@@ -256,8 +278,7 @@
             console.error('後台試算表寫入錯誤：', err);
         }
 
-        // 3. LINE 訊息精簡格式輸出
-        const messageText = `《普素素食 2026年7月訂購單》\n\n訂購品項與數量：\n${itemsSummary}💰 訂單總金額：$${totalOrderPrice} 元\n\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n我已閱讀並同意訂購說明 ✅`;
+        const messageText = `《普素素食 2026年7月訂購單》\n\n訂購品項與數量：\n${itemsSummary}💰 訂單總金額：$${priceAmounts.finalTotal} 元\n\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n我已閱讀並同意訂購說明 ✅`;
 
         if (liff.isInClient()) {
             try {
