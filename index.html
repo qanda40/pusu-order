@@ -9,123 +9,208 @@
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f7f4; color: #333; }
         .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        h2 { color: #4CAF50; text-align: center; }
-        .user-info { margin-bottom: 15px; font-weight: bold; color: #666; }
-        .product-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .qty-input { width: 60px; padding: 5px; text-align: center; }
-        .form-group { margin: 15px 0; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        button { width: 100%; padding: 12px; background-color: #4CAF50; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 15px; }
-        button:hover { background-color: #45a049; }
+        h2 { color: #4CAF50; text-align: center; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 25px; }
+        .product-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .product-name { font-weight: 500; }
+        
+        /* 加減按鈕樣式 */
+        .quantity-group { display: flex; align-items: center; }
+        .quantity-group button { width: 32px; height: 32px; padding: 0; background-color: #e0e0e0; color: #333; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; margin: 0; }
+        .quantity-group button:hover { background-color: #d5d5d5; }
+        .product-qty { width: 45px; height: 30px; border: none; text-align: center; font-size: 16px; background: transparent; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        .form-group { margin: 18px 0; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; }
+        input[type="text"], select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
+        
+        /* 同意勾選框樣式 */
+        .checkbox-group { display: flex; align-items: center; margin: 20px 0; font-size: 14px; }
+        .checkbox-group input { width: 18px; height: 18px; margin-right: 8px; cursor: pointer; }
+        
+        button.submit-btn { width: 100%; padding: 14px; background-color: #4CAF50; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button.submit-btn:hover { background-color: #45a049; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>普素素食 訂購單</h2>
-    <div class="user-info" id="user-display">正在載入您的 LINE 資訊...</div>
+    <div class="subtitle">歡迎使用線上訂購，請填寫以下表單：</div>
 
     <form id="orderForm">
-        <!-- 這裡放你的素食冷凍包品項 -->
+        <!-- 1. 最新品項與數量（採用加減鈕做法） -->
         <div class="product-item">
-            <span>招牌蘿蔔糕 ($155)</span>
-            <input type="number" class="product-qty" data-name="招牌蘿蔔糕" min="0" value="0">
+            <span class="product-name">✻ 素麵線</span>
+            <div class="quantity-group">
+                <button type="button" onclick="changeQty(this, -1)">-</button>
+                <input type="number" class="product-qty" data-name="素麵線" min="0" value="0" readonly>
+                <button type="button" onclick="changeQty(this, 1)">+</button>
+            </div>
         </div>
         <div class="product-item">
-            <span>特製芋頭糕 ($200)</span>
-            <input type="number" class="product-qty" data-name="特製芋頭糕" min="0" value="0">
+            <span class="product-name">✻ 麻辣素肉乾</span>
+            <div class="quantity-group">
+                <button type="button" onclick="changeQty(this, -1)">-</button>
+                <input type="number" class="product-qty" data-name="麻辣素肉乾" min="0" value="0" readonly>
+                <button type="button" onclick="changeQty(this, 1)">+</button>
+            </div>
+        </div>
+        <div class="product-item">
+            <span class="product-name">✻ 何首烏養生湯</span>
+            <div class="quantity-group">
+                <button type="button" onclick="changeQty(this, -1)">-</button>
+                <input type="number" class="product-qty" data-name="何首烏養生湯" min="0" value="0" readonly>
+                <button type="button" onclick="changeQty(this, 1)">+</button>
+            </div>
+        </div>
+        <div class="product-item">
+            <span class="product-name">✻ 猴菇四神湯</span>
+            <div class="quantity-group">
+                <button type="button" onclick="changeQty(this, -1)">-</button>
+                <input type="number" class="product-qty" data-name="猴菇四神湯" min="0" value="0" readonly>
+                <button type="button" onclick="changeQty(this, 1)">+</button>
+            </div>
+        </div>
+        <div class="product-item">
+            <span class="product-name">✻ 麻辣豆腐醬</span>
+            <div class="quantity-group">
+                <button type="button" onclick="changeQty(this, -1)">-</button>
+                <input type="number" class="product-qty" data-name="麻辣豆腐醬" min="0" value="0" readonly>
+                <button type="button" onclick="changeQty(this, 1)">+</button>
+            </div>
+        </div>
+        <div class="product-item">
+            <span class="product-name">✻ 撈麵醬</span>
+            <div class="quantity-group">
+                <button type="button" onclick="changeQty(this, -1)">-</button>
+                <input type="number" class="product-qty" data-name="撈麵醬" min="0" value="0" readonly>
+                <button type="button" onclick="changeQty(this, 1)">+</button>
+            </div>
         </div>
 
-        <!-- 訂購人資訊 -->
-        <div class="form-group">
-            <label for="username">收件人姓名</label>
-            <input type="text" id="username" required>
-        </div>
-        <div class="form-group">
-            <label for="phone">收件人電話</label>
-            <input type="text" id="phone" required>
-        </div>
+        <!-- 2. 收貨與收件人資訊 -->
         <div class="form-group">
             <label for="shipping">收貨方式</label>
-            <select id="shipping" required>
+            <select id="shipping" onchange="updateAddressLabel()" required>
                 <option value="7-11店到店">7-11店到店</option>
                 <option value="全家店到店">全家店到店</option>
-                <option value="黑貓冷凍宅配">黑貓冷凍宅配</option>
+                <option value="宅配">宅配</option>
             </select>
         </div>
+        
         <div class="form-group">
-            <label for="address">收件地址 / 超商門市名稱</label>
-            <input type="text" id="address" required>
+            <label for="username">收貨人姓名</label>
+            <input type="text" id="username" placeholder="請填寫收件人真實姓名" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">收貨人電話</label>
+            <input type="text" id="phone" placeholder="請填寫聯絡電話" required>
+        </div>
+        
+        <div class="form-group">
+            <label id="addressLabel" for="address">選擇[超商]請提供[店名]：</label>
+            <input type="text" id="address" placeholder="請填寫詳細地址或店名" required>
         </div>
 
-        <button type="submit">確認送出訂單</button>
+        <!-- 3. 同意條款勾選 -->
+        <div class="checkbox-group">
+            <input type="checkbox" id="agreeCheckbox" required>
+            <label for="agreeCheckbox" style="display:inline; font-weight:normal; margin:0; cursor:pointer;">
+                我已閱讀並同意訂購說明 ✅
+            </label>
+        </div>
+
+        <button type="submit" class="submit-btn">確認送出訂單</button>
     </form>
 </div>
 
 <script>
-    // 填入你在 LINE 開發者後台取得的 LIFF ID
+    // 填入你的 LIFF ID
     const MY_LIFF_ID = '2010580407-4JQQOeBf'; 
-
 
     async function initLiff() {
         try {
             await liff.init({ liffId: MY_LIFF_ID });
-            if (liff.isLoggedIn()) {
-                const profile = await liff.getProfile();
-                document.getElementById('user-display').innerText = `你好，${profile.displayName}！請填寫以下訂購資訊：`;
-                // 順便把 LINE 名字預填到姓名欄位，貼心！
-                document.getElementById('username').value = profile.displayName; 
-            } else {
-                liff.login(); // 如果沒登入就引導登入
+            if (!liff.isLoggedIn()) {
+                liff.login();
             }
         } catch (error) {
             console.error('LIFF 初始化失敗', error);
-            document.getElementById('user-display').innerText = '無法載入 LINE 資訊，請在 LINE 內開啟。';
         }
     }
 
+    // 數量加減按鈕控制
+    function changeQty(button, amount) {
+        const input = button.parentElement.querySelector('.product-qty');
+        let currentVal = parseInt(input.value) || 0;
+        let newVal = currentVal + amount;
+        if (newVal < 0) newVal = 0;
+        input.value = newVal;
+    }
+
+    // 動態更新地址欄位的文字提示
+    function updateAddressLabel() {
+        const shipping = document.getElementById('shipping').value;
+        const label = document.getElementById('addressLabel');
+        const input = document.getElementById('address');
+        
+        if (shipping === '宅配') {
+            label.innerText = '選擇[宅配]請提供[住址]：';
+            input.placeholder = '請填寫完整外送/寄送住址';
+        } else {
+            label.innerText = '選擇[超商]請提供[店名]：';
+            input.placeholder = '請填寫超商門市名稱 (例如：雙慶店)';
+        }
+    }
+
+    // 表單送出事件
     document.getElementById('orderForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // 1. 統計品項與數量
+        // 1. 統計勾選的品項
         let itemsSummary = '';
         const qtyInputs = document.querySelectorAll('.product-qty');
         qtyInputs.forEach(input => {
             const qty = parseInt(input.value);
             if (qty > 0) {
-                itemsSummary += ` 🔹 ${input.getAttribute('data-name')} x ${qty}\n`;
+                itemsSummary += `✻ ${input.getAttribute('data-name')} x ${qty}\n`;
             }
         });
 
         if (!itemsSummary) {
-            alert('請至少選擇一個商品數量唷！');
+            alert('請至少選擇一項商品的數量唷！');
             return;
         }
 
-        // 2. 抓取文字欄位
+        // 2. 讀取填寫欄位
+        const shipping = document.getElementById('shipping').value;
         const name = document.getElementById('username').value;
         const phone = document.getElementById('phone').value;
-        const shipping = document.getElementById('shipping').value;
         const address = document.getElementById('address').value;
 
-        // 3. 組裝要發送回聊天室的文字明細
-        const messageText = `《普素素食新訂單》\n\n【訂購品項】\n${itemsSummary}\n【收件資訊】\n👤 姓名：${name}\n📞 電話：${phone}\n📦 方式：${shipping}\n📍 地址/門市：${address}\n\n填單完成！請媽媽核對金額與出貨時間。`;
+        // 3. 依照收貨方式，組裝地址或店名格式
+        let addressSection = '';
+        if (shipping === '宅配') {
+            addressSection = `選擇[宅配]請提供[住址]：${address}`;
+        } else {
+            addressSection = `選擇[超商]請提供[店名]：${address}`;
+        }
 
-        // ==========================================
-        // 🚀 這裡之後可以加上 fetch() 打到你的資料庫 (如 Google Sheets)
-        // ==========================================
+        // 4. 完全依照您要求的 LINE 格式輸出
+        const messageText = `《我要訂購》\n品項與數量：\n${itemsSummary}\n收貨方式：[${shipping}]\n收貨人姓名：${name}\n收貨人電話：${phone}\n${addressSection}\n\n我已閱讀並同意訂購說明 ✅`;
 
-        // 4. 利用 LIFF 幫客人在聊天室發出訊息，並關閉視窗
+        // 5. 透過 LINE 發送訊息並關閉網頁
         if (liff.isInClient()) {
             try {
                 await liff.sendMessages([{ type: 'text', text: messageText }]);
-                liff.closeWindow(); // 成功發送後自動關閉網頁
+                liff.closeWindow();
             } catch (err) {
                 alert('訊息傳送失敗：' + err.message);
             }
         } else {
-            // 如果是用一般瀏覽器打開的(非LINE內)，就用 alert 呈現
             alert('偵測到不在 LINE 內，模擬發送訊息：\n\n' + messageText);
         }
     });
