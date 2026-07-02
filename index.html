@@ -44,7 +44,7 @@
     <div class="subtitle">歡迎使用線上訂購，請填寫以下表單：</div>
 
     <form id="orderForm">
-        <!-- 1. 最新品項與數量 -->
+        <!-- 1. 品項與數量 -->
         <div class="product-item">
             <div>
                 <span class="product-name">✻ 素麵線</span>
@@ -112,12 +112,22 @@
             </div>
         </div>
 
-        <!-- 即時加總總金額顯示區 -->
+        <!-- 總金額顯示 -->
         <div class="total-price-box">
             訂單總金額：$<span id="totalPriceDisplay">0</span> 元
         </div>
 
-        <!-- 2. 收貨與收件人資訊 -->
+        <!-- 2. 客人資訊欄位（已調整順序，收貨方式移到電話後面） -->
+        <div class="form-group">
+            <label for="username">收貨人姓名</label>
+            <input type="text" id="username" placeholder="請填寫收件人真實姓名" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">收貨人電話</label>
+            <input type="text" id="phone" placeholder="請填寫聯絡電話" required>
+        </div>
+
         <div class="form-group">
             <label for="shipping">收貨方式</label>
             <select id="shipping" onchange="updateAddressLabel()" required>
@@ -128,17 +138,7 @@
         </div>
         
         <div class="form-group">
-            <label for="username">收貨人姓名</label>
-            <input type="text" id="username" placeholder="請填寫收件人真實姓名" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="phone">收貨人電話</label>
-            <input type="text" id="phone" placeholder="請填寫聯絡電話" required>
-        </div>
-        
-        <div class="form-group">
-            <label id="addressLabel" for="address">選擇[超商]請提供[店名]：</label>
+            <label id="addressLabel" for="address">超商店名：</label>
             <input type="text" id="address" placeholder="請填寫超商門市名稱 (例如：中正店)" required>
         </div>
 
@@ -168,7 +168,6 @@
         }
     }
 
-    // 數量加減按鈕控制，並即時計算總金額
     function changeQty(button, amount) {
         const input = button.parentElement.querySelector('.product-qty');
         let currentVal = parseInt(input.value) || 0;
@@ -179,7 +178,6 @@
         calculateTotal();
     }
 
-    // 計算總金額的函式
     function calculateTotal() {
         let total = 0;
         const qtyInputs = document.querySelectorAll('.product-qty');
@@ -192,26 +190,25 @@
         return total;
     }
 
-    // 動態更新地址欄位的文字提示
+    // 網頁欄位提示字切換
     function updateAddressLabel() {
         const shipping = document.getElementById('shipping').value;
         const label = document.getElementById('addressLabel');
         const input = document.getElementById('address');
         
         if (shipping === '宅配') {
-            label.innerText = '選擇[宅配]請提供[住址]：';
-            input.placeholder = '請填寫完整外送/寄送住址';
+            label.innerText = '收件住址：';
+            input.placeholder = '請填寫完整寄送住址';
         } else {
-            label.innerText = '選擇[超商]請提供[店名]：';
+            label.innerText = '超商店名：';
             input.placeholder = '請填寫超商門市名稱 (例如：中正店)';
         }
     }
 
-    // 表單送出事件
+    // 表單送出
     document.getElementById('orderForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // 1. 統計勾選的品項與加總
         let itemsSummary = '';
         let totalOrderPrice = 0;
         const qtyInputs = document.querySelectorAll('.product-qty');
@@ -220,7 +217,8 @@
             const qty = parseInt(input.value) || 0;
             const price = parseInt(input.getAttribute('data-price')) || 0;
             if (qty > 0) {
-                itemsSummary += `項目：✻ ${input.getAttribute('data-name')} x ${qty}\n`;
+                // 去掉了原本的「項目：」字樣，格式更乾淨
+                itemsSummary += `✻ ${input.getAttribute('data-name')} x ${qty}\n`;
                 totalOrderPrice += qty * price;
             }
         });
@@ -230,24 +228,17 @@
             return;
         }
 
-        // 2. 讀取填寫欄位
-        const shipping = document.getElementById('shipping').value;
         const name = document.getElementById('username').value;
         const phone = document.getElementById('phone').value;
+        const shipping = document.getElementById('shipping').value;
         const address = document.getElementById('address').value;
 
-        // 3. 依照收貨方式，組裝地址或店名格式
-        let addressSection = '';
-        if (shipping === '宅配') {
-            addressSection = `選擇[宅配]請提供[住址]：${address}`;
-        } else {
-            addressSection = `選擇[超商]請提供[店名]：${address}`;
-        }
+        // 判斷 LINE 訊息是要顯示「超商店名」還是「收件住址」
+        let locationLabel = (shipping === '宅配') ? '收件住址' : '超商店名';
 
-        // 4. LINE 格式輸出（開頭改為2026七月，末端加上加總金額）
-        const messageText = `《普素素食 2026年7月訂購單》\n品項與數量：\n${itemsSummary}\n收貨方式：[${shipping}]\n收貨人姓名：${name}\n收貨人電話：${phone}\n${addressSection}\n💰 訂單總金額：$${totalOrderPrice} 元\n\n我已閱讀並同意訂購說明 ✅`;
+        // 完美對齊您要求的 LINE 精簡新格式
+        const messageText = `《普素素食 2026年7月訂購單》\n\n訂購品項與數量：\n${itemsSummary}💰 訂單總金額：$${totalOrderPrice} 元\n\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n我已閱讀並同意訂購說明 ✅`;
 
-        // 5. 透過 LINE 發送訊息並關閉網頁
         if (liff.isInClient()) {
             try {
                 await liff.sendMessages([{ type: 'text', text: messageText }]);
