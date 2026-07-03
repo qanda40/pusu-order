@@ -303,18 +303,25 @@
             console.error('後台試算表寫入錯誤：', err);
         }
 
-        // 3. 🌟 修改這裡：完美對齊你想要的 LINE 訊息格式！
+        // 1. 訂單明細
         const messageText = `《普素素食 2026年7月訂購單》\n\n訂購品項與數量：\n${itemsSummary}\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n商品總計：$${priceAmounts.subtotal} 元\n運費＋包材費：$${priceAmounts.shippingFee} 元\n💰 訂單總金額：$${priceAmounts.finalTotal} 元\n\n我已閱讀並同意訂購說明 ✅`;
+
+        // 2. 🌟 精準對齊你選定的系統提示文字！
+        const replyText = `📢 系統提示：訂單已成功送出！請靜候客服人員與您聯繫確認。`;
 
         if (liff.isInClient()) {
             try {
-                await liff.sendMessages([{ type: 'text', text: messageText }]);
+                // 連發兩則訊息
+                await liff.sendMessages([
+                    { type: 'text', text: messageText },
+                    { type: 'text', text: replyText }
+                ]);
                 liff.closeWindow();
             } catch (err) {
                 alert('訊息傳送失敗：' + err.message);
             }
         } else {
-            alert('偵測到不在 LINE 內，模擬發送並寫入試算表：\n\n' + messageText);
+            alert('偵測到不在 LINE 內，模擬發送：\n\n' + messageText + '\n\n' + replyText);
         }
     });
 
