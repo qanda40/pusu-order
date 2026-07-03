@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>普素素食 - 2026年7月線上訂購</title>
+    <!-- 引入 LINE LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f7f4; color: #333; }
@@ -46,6 +47,7 @@
     <div class="subtitle">歡迎使用線上訂購，請填寫以下表單：</div>
 
     <form id="orderForm">
+        <!-- 1. 品項與數量 -->
         <div class="product-item">
             <div>
                 <span class="product-name">▪ 素麵線 1000g</span>
@@ -113,6 +115,7 @@
             </div>
         </div>
 
+        <!-- 2. 客人資訊欄位 -->
         <div class="form-group">
             <label for="username">收貨人姓名</label>
             <input type="text" id="username" placeholder="請填寫收件人真實姓名" required>
@@ -138,6 +141,7 @@
             <input type="text" id="address" placeholder="請填寫7-11門市名稱 (例如：中正店)" required>
         </div>
 
+        <!-- 金額明細顯示區 -->
         <div class="price-summary-box">
             <div class="price-row">
                 <span>商品總計：</span>
@@ -153,6 +157,7 @@
             </div>
         </div>
 
+        <!-- 3. 同意條款勾選 -->
         <div class="checkbox-group">
             <input type="checkbox" id="agreeCheckbox" required>
             <label for="agreeCheckbox" style="display:inline; font-weight:normal; margin:0; cursor:pointer;">
@@ -303,25 +308,19 @@
             console.error('後台試算表寫入錯誤：', err);
         }
 
-        // 1. 訂單明細
-        const messageText = `《普素素食 2026年7月訂購單》\n\n訂購品項與數量：\n${itemsSummary}\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n商品總計：$${priceAmounts.subtotal} 元\n運費＋包材費：$${priceAmounts.shippingFee} 元\n💰 訂單總金額：$${priceAmounts.finalTotal} 元\n\n我已閱讀並同意訂購說明 ✅`;
-
-        // 2. 🌟 精準對齊你選定的系統提示文字！
-        const replyText = `📢 系統提示：訂單已成功送出！請靜候客服人員與您聯繫確認。`;
+        // 🌟 直接將「提示文字」合併進同一條訊息的最下方，百分之百發送成功！
+        const messageText = `《普素素食 2026年7月訂購單》\n\n訂購品項與數量：\n${itemsSummary}\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n商品總計：$${priceAmounts.subtotal} 元\n運費＋包材費：$${priceAmounts.shippingFee} 元\n💰 訂單總金額：$${priceAmounts.finalTotal} 元\n\n我已閱讀並同意訂購說明 ✅\n\n---------------------\n📢 系統提示：訂單已成功送出！請靜候客服人員與您聯繫確認。`;
 
         if (liff.isInClient()) {
             try {
-                // 連發兩則訊息
-                await liff.sendMessages([
-                    { type: 'text', text: messageText },
-                    { type: 'text', text: replyText }
-                ]);
+                // 單發一則大訊息，最穩定
+                await liff.sendMessages([{ type: 'text', text: messageText }]);
                 liff.closeWindow();
             } catch (err) {
                 alert('訊息傳送失敗：' + err.message);
             }
         } else {
-            alert('偵測到不在 LINE 內，模擬發送：\n\n' + messageText + '\n\n' + replyText);
+            alert('偵測到不在 LINE 內，模擬發送：\n\n' + messageText);
         }
     });
 
