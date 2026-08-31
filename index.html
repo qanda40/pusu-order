@@ -11,15 +11,22 @@
         .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         h2 { color: #4CAF50; text-align: center; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 25px; }
-        .product-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .product-name { font-weight: 500; }
-        .product-price { color: #888; font-size: 13px; margin-left: 5px; }
+        
+        /* 🌟 優化版品項列：彈性佈局，防止手機字體放大跑版 */
+        .product-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; gap: 8px; }
+        
+        /* 商品資訊區塊：名稱靠左，價格獨立靠右 */
+        .product-info { display: flex; align-items: center; justify-content: space-between; flex: 1; padding-right: 10px; }
+        .product-name { font-weight: 500; font-size: 15px; }
+        
+        /* 🌟 價格樣式：加深、加粗、靠右對齊 */
+        .product-price { font-weight: bold; color: #2e7d32; font-size: 15px; white-space: nowrap; margin-left: auto; }
         
         /* 加減按鈕樣式 */
-        .quantity-group { display: flex; align-items: center; }
+        .quantity-group { display: flex; align-items: center; flex-shrink: 0; }
         .quantity-group button { width: 32px; height: 32px; padding: 0; background-color: #e0e0e0; color: #333; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; margin: 0; }
         .quantity-group button:hover { background-color: #d5d5d5; }
-        .product-qty { width: 45px; height: 30px; border: none; text-align: center; font-size: 16px; background: transparent; }
+        .product-qty { width: 40px; height: 30px; border: none; text-align: center; font-size: 16px; background: transparent; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         
         /* 總金額明細顯示區塊 */
@@ -47,11 +54,11 @@
     <div class="subtitle">歡迎使用線上訂購，請填寫以下表單：</div>
 
     <form id="orderForm">
-        <!-- 1. 9月新商品與價格 -->
+        <!-- 1. 品項與價格（全新清晰對齊版型） -->
         <div class="product-item">
-            <div>
+            <div class="product-info">
                 <span class="product-name">▪ XO醬 250ml</span>
-                <span class="product-price">($210)</span>
+                <span class="product-price">$210</span>
             </div>
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
@@ -59,10 +66,11 @@
                 <button type="button" onclick="changeQty(this, 1)">+</button>
             </div>
         </div>
+        
         <div class="product-item">
-            <div>
+            <div class="product-info">
                 <span class="product-name">▪ 紅燒湯 800g/包</span>
-                <span class="product-price">($160)</span>
+                <span class="product-price">$160</span>
             </div>
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
@@ -70,10 +78,11 @@
                 <button type="button" onclick="changeQty(this, 1)">+</button>
             </div>
         </div>
+
         <div class="product-item">
-            <div>
+            <div class="product-info">
                 <span class="product-name">▪ 麻辣素肉干 150g/包</span>
-                <span class="product-price">($120)</span>
+                <span class="product-price">$120</span>
             </div>
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
@@ -275,7 +284,7 @@
             console.error('後台試算表寫入錯誤：', err);
         }
 
-        // 合併大訊息格式（更新為 9月訂購單標題）
+        // 合併大訊息格式
         const messageText = `《普素素食 2026年9月訂購單》\n\n訂購品項與數量：\n${itemsSummary}\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n商品總計：$${priceAmounts.subtotal} 元\n運費＋包材費：$${priceAmounts.shippingFee} 元\n💰 訂單總金額：$${priceAmounts.finalTotal} 元\n\n我已閱讀並同意訂購說明 ✅\n\n---------------------\n📢 系統提示：訂單已成功送出！請靜候客服人員與您聯繫確認。`;
 
         if (liff.isInClient()) {
