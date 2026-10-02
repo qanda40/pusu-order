@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>普素素食 - 2026年9月線上訂購</title>
+    <title>普素素食 - 2026年10月線上訂購</title>
     <!-- 引入 LINE LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
@@ -57,36 +57,48 @@
         <!-- 1. 品項與價格（全新清晰對齊版型） -->
         <div class="product-item">
             <div class="product-info">
-                <span class="product-name">▪ XO醬 250ml</span>
-                <span class="product-price">$210</span>
+                <span class="product-name">▪ 三杯醬爆雙菇 450g</span>
+                <span class="product-price">$300</span>
             </div>
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
-                <input type="number" class="product-qty" data-name="XO醬 250ml" data-price="210" min="0" value="0" readonly>
+                <input type="number" class="product-qty" data-name="三杯醬爆雙菇 450g" data-price="300" min="0" value="0" readonly>
                 <button type="button" onclick="changeQty(this, 1)">+</button>
             </div>
         </div>
         
         <div class="product-item">
             <div class="product-info">
-                <span class="product-name">▪ 紅燒湯 800g/包</span>
-                <span class="product-price">$160</span>
+                <span class="product-name">▪ 麻辣素肉乾 150g</span>
+                <span class="product-price">$120</span>
             </div>
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
-                <input type="number" class="product-qty" data-name="紅燒湯 800g/包" data-price="160" min="0" value="0" readonly>
+                <input type="number" class="product-qty" data-name="麻辣素肉乾 150g" data-price="120" min="0" value="0" readonly>
                 <button type="button" onclick="changeQty(this, 1)">+</button>
             </div>
         </div>
 
         <div class="product-item">
             <div class="product-info">
-                <span class="product-name">▪ 麻辣素肉干 150g/包</span>
-                <span class="product-price">$120</span>
+                <span class="product-name">▪ 猴菇四神湯 800g</span>
+                <span class="product-price">$130</span>
             </div>
             <div class="quantity-group">
                 <button type="button" onclick="changeQty(this, -1)">-</button>
-                <input type="number" class="product-qty" data-name="麻辣素肉干 150g/包" data-price="120" min="0" value="0" readonly>
+                <input type="number" class="product-qty" data-name="猴菇四神湯 800g" data-price="130" min="0" value="0" readonly>
+                <button type="button" onclick="changeQty(this, 1)">+</button>
+            </div>
+        </div>
+
+        <div class="product-item">
+            <div class="product-info">
+                <span class="product-name">▪ 紅燒素牛腩 400g</span>
+                <span class="product-price">$100</span>
+            </div>
+            <div class="quantity-group">
+                <button type="button" onclick="changeQty(this, -1)">-</button>
+                <input type="number" class="product-qty" data-name="紅燒素牛腩 400g" data-price="100" min="0" value="0" readonly>
                 <button type="button" onclick="changeQty(this, 1)">+</button>
             </div>
         </div>
@@ -285,7 +297,7 @@
         }
 
         // 合併大訊息格式
-        const messageText = `《普素素食 2026年9月訂購單》\n\n訂購品項與數量：\n${itemsSummary}\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n商品總計：$${priceAmounts.subtotal} 元\n運費＋包材費：$${priceAmounts.shippingFee} 元\n💰 訂單總金額：$${priceAmounts.finalTotal} 元\n\n我已閱讀並同意訂購說明 ✅\n\n---------------------\n📢 系統提示：訂單已成功送出！請靜候客服人員與您聯繫確認。`;
+        const messageText = `《普素素食 2026年10月訂購單》\n\n訂購品項與數量：\n${itemsSummary}\n收貨人姓名：${name}\n收貨人電話：${phone}\n收貨方式：${shipping}\n${locationLabel}：${address}\n\n商品總計：$${priceAmounts.subtotal} 元\n運費＋包材費：$${priceAmounts.shippingFee} 元\n💰 訂單總金額：$${priceAmounts.finalTotal} 元\n\n我已閱讀並同意訂購說明 ✅\n\n---------------------\n📢 系統提示：訂單已成功送出！請靜候客服人員與您聯繫確認。`;
 
         if (liff.isInClient()) {
             try {
